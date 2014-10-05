@@ -28,6 +28,8 @@ public class MainActivity extends ActionBarActivity implements
 
 	private SpeechProvider speechProvider;
 
+	private DialogResultProvider dialogProvider;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,21 +52,19 @@ public class MainActivity extends ActionBarActivity implements
 	protected void noticeNewResults() {
 		results = wikiProvider.getNearbyWikiEntries(locationProvider
 				.getCurrentLocationCoordinates());
-		showResults(results);
+		dialogProvider.showResults(results);
 	}
 
 	
 	
 
-	private void speakOut(String text) {
-
-		tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-	}
+	
 
 	private void startProviders() {
 		locationProvider = new LocationProvider(this);
-		wikiProvider = new WikiProvider();
-		speechProvider = new SpeechProvider(this)
+		wikiProvider = new WikiProvider(this);
+		speechProvider = new SpeechProvider(this);
+		dialogProvider = new DialogResultProvider(this);
 		tts = new TextToSpeech(this, this);
 
 	}

@@ -27,8 +27,9 @@ public class DialogResultProvider extends Providers {
 		textlist.setAdapter(adapter);
 		match_text_dialog.show();
 		for (String res : results) {
-			speakOut(res);
-			while (tts.isSpeaking()) {
+			//speakOut(res);
+			//while (tts.isSpeaking()) 
+			{
 			}
 		}
 		textlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -36,8 +37,9 @@ public class DialogResultProvider extends Providers {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				speakOut(results.get(position));
+				//speakOut(results.get(position));
 				match_text_dialog.hide();
 			}
 		});
+	}
 }

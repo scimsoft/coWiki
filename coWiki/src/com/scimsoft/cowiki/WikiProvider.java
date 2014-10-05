@@ -19,6 +19,11 @@ import com.scimsoft.cowiki.helpers.JSONParser;
 
 public class WikiProvider extends Providers{
 
+	WikiProvider(MainActivity mainActivity) {
+		super(mainActivity);
+		
+	}
+
 	JSONParser parser = new JSONParser();
 	List<NameValuePair> params =new ArrayList<NameValuePair>(5); ;
 	private JSONObject wikiResponse;
