@@ -25,13 +25,7 @@ public class DialogResultProvider extends Providers {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(super.mainActivity,
 				android.R.layout.simple_list_item_1, results);
 		textlist.setAdapter(adapter);
-		match_text_dialog.show();
-		for (String res : results) {
-			//speakOut(res);
-			//while (tts.isSpeaking()) 
-			{
-			}
-		}
+		
 		textlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -41,5 +35,6 @@ public class DialogResultProvider extends Providers {
 				match_text_dialog.hide();
 			}
 		});
+		match_text_dialog.show();
 	}
 }

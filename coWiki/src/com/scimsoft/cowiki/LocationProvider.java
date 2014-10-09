@@ -57,8 +57,9 @@ public class LocationProvider {
 	}
 	private void setNewLocation(Location location) {
 		Location lastLocation = getLastKnownLocation();
-		if (isBetterLocation(location,lastLocation )){
+		if (isBetterLocation(lastLocation,location )){
 			currentLocation = location;
+			
 			mainActivity.noticeNewResults();
 		}
 	}
@@ -130,6 +131,11 @@ public class LocationProvider {
 	      return provider2 == null;
 	    }
 	    return provider1.equals(provider2);
+	}
+	public void updateLocation() {
+		// TODO Auto-generated method stub
+		
+		
 	}
 	
 }

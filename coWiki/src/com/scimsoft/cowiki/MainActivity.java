@@ -1,19 +1,13 @@
 package com.scimsoft.cowiki;
 
 import java.util.List;
-import java.util.Locale;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity implements
 		TextToSpeech.OnInitListener {
@@ -22,12 +16,7 @@ public class MainActivity extends ActionBarActivity implements
 
 	private LocationProvider locationProvider;
 	private WikiProvider wikiProvider;
-	
-	private List<String> results;
-	private TextToSpeech tts;
-
-	private SpeechProvider speechProvider;
-
+	private  SpeechProvider speechProvider;
 	private DialogResultProvider dialogProvider;
 
 	@Override
@@ -42,6 +31,7 @@ public class MainActivity extends ActionBarActivity implements
 
 			@Override
 			public void onClick(View v) {
+				locationProvider.updateLocation();
 				noticeNewResults();
 			}
 
@@ -50,51 +40,29 @@ public class MainActivity extends ActionBarActivity implements
 	}
 
 	protected void noticeNewResults() {
-		results = wikiProvider.getNearbyWikiEntries(locationProvider
-				.getCurrentLocationCoordinates());
+		List<String> results = wikiProvider
+				.getNearbyWikiEntries(locationProvider
+						.getCurrentLocationCoordinates());
 		dialogProvider.showResults(results);
+		speechProvider.speekResults(results);
 	}
-
-	
-	
-
-	
 
 	private void startProviders() {
 		locationProvider = new LocationProvider(this);
 		wikiProvider = new WikiProvider(this);
 		speechProvider = new SpeechProvider(this);
 		dialogProvider = new DialogResultProvider(this);
-		tts = new TextToSpeech(this, this);
 
 	}
 
 	@Override
 	public void onInit(int status) {
-		if (status == TextToSpeech.SUCCESS) {
-			// Locale loc = new Locale ("spa", "ESP");
-			Locale loc = new Locale("nl", "NL");
-			int result = tts.setLanguage(loc);
-
-			if (result == TextToSpeech.LANG_MISSING_DATA
-					|| result == TextToSpeech.LANG_NOT_SUPPORTED) {
-				Log.e("TTS", "This Language is not supported");
-			} else {
-			}
-
-		} else {
-			Log.e("TTS", "Initilization Failed!");
-		}
+		speechProvider.onInit(status);
 	}
 
 	@Override
 	public void onDestroy() {
-		// Don't forget to shutdown tts!
-		if (tts != null) {
-			tts.stop();
-			tts.shutdown();
-		}
-		super.onDestroy();
+		speechProvider.onDestroy();
 	}
 
 }
