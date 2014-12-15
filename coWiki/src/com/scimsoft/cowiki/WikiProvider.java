@@ -2,7 +2,9 @@ package com.scimsoft.cowiki;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -20,17 +22,55 @@ import com.scimsoft.cowiki.helpers.JSONParser;
 public class WikiProvider extends Providers{
 
 	WikiProvider(MainActivity mainActivity) {
-		super(mainActivity);
-		
+		super(mainActivity);		
 	}
 
 	JSONParser parser = new JSONParser();
-	List<NameValuePair> params =new ArrayList<NameValuePair>(5); ;
+	
 	private JSONObject wikiResponse;
 	private JSONArray titles;
 	
-	public List<String> getNearbyWikiEntries(Coordinates coordinates){
+	public String getDetailExtract(String title){
+		List<NameValuePair> params =new ArrayList<NameValuePair>(5);
+		params.add(new BasicNameValuePair("action","query") );
+		 params.add(new BasicNameValuePair("prop","extracts") );
+		 params.add(new BasicNameValuePair("exintro","") );
+		 params.add(new BasicNameValuePair("format","json") );
+		 params.add(new BasicNameValuePair("explaintext","") );
+		 params.add(new BasicNameValuePair("titles",title) );
+		 
+		try {
+			String country = mainActivity.locationProvider.getLocationLocale().toLowerCase(Locale.getDefault());
+			String wikiUrl="https://"+country+".wikipedia.org/w/api.php";
+			wikiResponse = parser.makeHttpRequest(wikiUrl,params);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		String text="";
+		 try {
+				JSONObject query = wikiResponse.getJSONObject("query");
+				JSONObject pages = query.getJSONObject("pages");
+				@SuppressWarnings("unchecked")
+				Iterator<String> iterator = pages.keys();
+				String key = "";
+				 while(iterator.hasNext()){
+		                key = iterator.next();
+		                text = (String) ((JSONObject)pages.get(key)).get("extract");
+		            }
+				
+			} catch (JSONException e) {
+				
+				e.printStackTrace();
+			}
+			
+			
+			return text;
+	}
+	
+	public List<String> getNearbyWikiEntries(Coordinates coordinates){
+		List<NameValuePair> params =new ArrayList<NameValuePair>(5);
 		 params.add(new BasicNameValuePair("action","query") );
 		 params.add(new BasicNameValuePair("list","geosearch") );
 		 params.add(new BasicNameValuePair("gsradius","10000") );
@@ -42,7 +82,9 @@ public class WikiProvider extends Providers{
 		 
 		 
 		try {
-			wikiResponse = parser.makeHttpRequest("https://nl.wikipedia.org/w/api.php", params);
+			String country = mainActivity.locationProvider.getLocationLocale().toLowerCase(Locale.getDefault());
+			String wikiUrl="https://"+country+".wikipedia.org/w/api.php";
+			wikiResponse = parser.makeHttpRequest(wikiUrl, params);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

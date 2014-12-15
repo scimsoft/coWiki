@@ -1,6 +1,6 @@
 package com.scimsoft.cowiki;
 
-import com.scimsoft.cowiki.helpers.Coordinates;
+import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,6 +9,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+
+import com.scimsoft.cowiki.helpers.Coordinates;
 
 @SuppressLint("ServiceCast")
 public class LocationProvider {
@@ -58,8 +60,7 @@ public class LocationProvider {
 	private void setNewLocation(Location location) {
 		Location lastLocation = getLastKnownLocation();
 		if (isBetterLocation(lastLocation,location )){
-			currentLocation = location;
-			
+			currentLocation = location;			
 			mainActivity.noticeNewResults();
 		}
 	}
@@ -136,6 +137,14 @@ public class LocationProvider {
 		// TODO Auto-generated method stub
 		
 		
+	}
+	public String getDeviceLocale(){
+		String locale = mainActivity.getResources().getConfiguration().locale.getCountry(); 
+		return locale;
+	}
+	public String getLocationLocale(){		
+		Locale locale = Locale.getDefault();
+		return locale.getCountry();
 	}
 	
 }

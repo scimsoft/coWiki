@@ -30,11 +30,16 @@ public class DialogResultProvider extends Providers {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-
-				//speakOut(results.get(position));
+				String selected = textlist.getItemAtPosition(position).toString();
+				//smatch_text_dialogpeakOut(results.get(position));
 				match_text_dialog.hide();
+				mainActivity.showDetails(selected);
 			}
+
+			
 		});
+		
 		match_text_dialog.show();
 	}
+	
 }

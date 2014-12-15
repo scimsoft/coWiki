@@ -8,26 +8,28 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 public class MainActivity extends ActionBarActivity implements
 		TextToSpeech.OnInitListener {
 
-	private Button Start;
+	private Button searchNearbyButton;
 
-	private LocationProvider locationProvider;
+	public LocationProvider locationProvider;
 	private WikiProvider wikiProvider;
-	private  SpeechProvider speechProvider;
+	private SpeechProvider speechProvider;
 	private DialogResultProvider dialogProvider;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		Start = (Button) findViewById(R.id.start_reg);
+		searchNearbyButton = (Button) findViewById(R.id.start_reg);
 
 		startProviders();
 
-		Start.setOnClickListener(new OnClickListener() {
+		searchNearbyButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -36,6 +38,18 @@ public class MainActivity extends ActionBarActivity implements
 			}
 
 		});
+		
+		ImageButton stopSpeach = (ImageButton) findViewById(R.id.stopSpeach);
+		stopSpeach.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				speechProvider.interuptSpeech();
+			
+			}
+
+		});
+		
 
 	}
 
@@ -45,6 +59,10 @@ public class MainActivity extends ActionBarActivity implements
 						.getCurrentLocationCoordinates());
 		dialogProvider.showResults(results);
 		speechProvider.speekResults(results);
+	}
+	public void showDetails(String selected) {
+		String extract = wikiProvider.getDetailExtract(selected);
+		speechProvider.speekWikiExtract(extract);
 	}
 
 	private void startProviders() {

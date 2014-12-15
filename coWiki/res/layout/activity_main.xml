@@ -2,25 +2,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".MainActivity" >
+
     <TextView
         android:id="@+id/welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
         android:layout_gravity="center"
-        android:text="NearbyLocations" />
-   <Button
+        android:text="Nearby Locations"
+        android:textSize="30sp" />
+
+    <Button
         android:id="@+id/start_reg"
+        android:layout_width="259dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.68"
+        android:background="@drawable/ic_start"
+        android:text="See Locations" />
+
+    <ImageButton
+        android:id="@+id/stopSpeach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_stop_speech" />
+
+    <TextView
+        android:id="@+id/speech"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="See Locations" />
-     <TextView
-        android:id="@+id/speech"
-        android:textSize="25sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:textSize="25sp" />
+
 </LinearLayout>
