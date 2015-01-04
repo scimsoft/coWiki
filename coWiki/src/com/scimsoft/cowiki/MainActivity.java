@@ -1,6 +1,7 @@
 package com.scimsoft.cowiki;
 
-import java.util.List;
+
+
 
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+
+import com.scimsoft.cowiki.helpers.Coordinates;
 
 public class MainActivity extends ActionBarActivity implements
 		TextToSpeech.OnInitListener {
@@ -20,6 +23,8 @@ public class MainActivity extends ActionBarActivity implements
 	private SpeechProvider speechProvider;
 	private DialogResultProvider dialogProvider;
 	
+	 
+	 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +33,12 @@ public class MainActivity extends ActionBarActivity implements
 		searchNearbyButton = (Button) findViewById(R.id.start_reg);
 
 		startProviders();
-
+		if(!locationProvider.isGPSEnabled)locationProvider.showSettingsAlert();
 		searchNearbyButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				locationProvider.updateLocation();
+				locationProvider.getLocation();
 				noticeNewResults();
 			}
 
@@ -54,9 +59,10 @@ public class MainActivity extends ActionBarActivity implements
 	}
 
 	protected void noticeNewResults() {
-		List<String> results = wikiProvider
-				.getNearbyWikiEntries(locationProvider
-						.getCurrentLocationCoordinates());
+		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
+		java.util.List<String> results = wikiProvider
+				.getNearbyWikiEntries(coordinates);
+		
 		dialogProvider.showResults(results);
 		speechProvider.speekResults(results);
 	}
@@ -81,6 +87,7 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onDestroy() {
 		speechProvider.onDestroy();
+		locationProvider.stopUsingGPS();
 	}
 
 }
