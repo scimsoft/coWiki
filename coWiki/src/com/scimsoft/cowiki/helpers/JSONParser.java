@@ -18,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
-import com.scimsoft.cowiki.R;
 
 public class JSONParser {
 

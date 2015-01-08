@@ -1,13 +1,9 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <FrameLayout
-        android:id="@+id/content_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fadingEdge="vertical" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/black"
+    android:baselineAligned="false"
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/welcome"
@@ -15,29 +11,76 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|center"
         android:text="@string/nearby_locations"
+        android:textColor="@color/white"
         android:textSize="30sp" />
 
-    <Button
-        android:id="@+id/start_reg"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:layout_gravity="center"        
-        android:background="@drawable/ic_start"
-        android:text="@string/see_locations" />
-
-    <ImageButton
-        android:id="@+id/stopSpeach"
+    <ImageView
+        android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/stop_voice"
-        android:src="@drawable/ic_action_stop_voice" 
-        android:layout_gravity="bottom|center"/>
+        android:layout_weight="1.0"
+        android:contentDescription="TODO"
+        android:src="@drawable/ic_app_bground" />
 
-    <TextView
-        android:id="@+id/speech"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="25sp" />
-    </FrameLayout>
-</android.support.v4.widget.DrawerLayout>
+        android:gravity="bottom"
+        android:orientation="horizontal" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
+
+        <ImageButton
+            android:id="@+id/stopSpeach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:background="@color/black"
+            android:contentDescription="@string/stop_voice"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/btn_pause" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
+
+        <ImageButton
+            android:id="@+id/goSpeach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:background="@color/black"
+            android:contentDescription="@string/stop_voice"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/btn_go" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
+
+        <ImageButton
+            android:id="@+id/goRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:background="@color/black"
+            android:contentDescription="@string/stop_voice"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/btn_refresh" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,6 +1,5 @@
 package com.scimsoft.cowiki.helpers;
 
-import com.scimsoft.cowiki.R;
 
 public class Coordinates {
 	private String latitude;

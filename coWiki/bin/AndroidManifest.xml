@@ -5,8 +5,8 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="7" />
+        android:minSdkVersion="8"
+        android:targetSdkVersion="8" />
     
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" /> 
@@ -27,6 +27,7 @@
         </activity>
         <activity android:name="com.scimsoft.listview.Expand_ListView" android:label="@string/app_name"></activity>
         <activity android:name="com.scimsoft.listview.expand.Expand_Custom_ListView" android:label="@string/app_name"></activity>
+        <activity android:name="com.scimsoft.view.ListViewActivityProvider"></activity>
     </application>
 
 </manifest>
