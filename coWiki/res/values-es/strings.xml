@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WhatsNear</string>
+   
+    <string name="stop_voice">Parar la voz</string>
+    <string name="share_text">Te aconsejo esta aplicacion para tus viajes: https://play.google.com/store/apps/details?id=com.scimsoft.cowiki</string>
+</resources>
