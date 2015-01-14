@@ -21,14 +21,13 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-
 import com.scimsoft.whatsnear.helpers.Coordinates;
 import com.scimsoft.whatsnear.providers.LocalesProvider;
 import com.scimsoft.whatsnear.providers.LocationProvider;
 import com.scimsoft.whatsnear.providers.SpeechProvider;
 import com.scimsoft.whatsnear.providers.TripAdvisorProvider;
 import com.scimsoft.whatsnear.providers.WikiProvider;
-import com.scimsoft.whatsnear.view.ListViewActivityProvider;
+import com.scimsoft.whatsnear.view.WikiResultsListViewActivityProvider;
 
 public class MainActivity extends Activity implements OnInitListener {
 
@@ -111,6 +110,29 @@ public class MainActivity extends Activity implements OnInitListener {
 				showDetails(lasteslected);
 			}
 		});
+		
+		ImageButton goRestaurant = (ImageButton) findViewById(R.id.goRestaurant);
+		goRestaurant.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				v.startAnimation(scale);
+				locationProvider.getLocation();
+				speechProvider.interuptSpeech();
+				noticeNewTripResults();
+			}
+		});
+		ImageButton goWikipedia = (ImageButton) findViewById(R.id.goWiki);
+		goWikipedia.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				v.startAnimation(scale);
+				locationProvider.getLocation();
+				speechProvider.interuptSpeech();
+				noticeNewWikiResults();
+			}
+		});
 
 	}
 
@@ -128,7 +150,7 @@ public class MainActivity extends Activity implements OnInitListener {
 
 		if (!isMyServiceRunning()) {
 			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, ListViewActivityProvider.class);
+			intent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
 			intent.putStringArrayListExtra("list", (ArrayList<String>) results);
 			startActivityForResult(intent, 0);
 			speechProvider.speekResults(results);
@@ -140,7 +162,7 @@ public class MainActivity extends Activity implements OnInitListener {
 
 		if (!isMyServiceRunning()) {
 			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, ListViewActivityProvider.class);
+			intent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
 			intent.putStringArrayListExtra("list", (ArrayList<String>) results);
 			startActivityForResult(intent, 0);
 			speechProvider.speekResults(results);

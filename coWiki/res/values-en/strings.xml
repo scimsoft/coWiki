@@ -3,7 +3,7 @@
     <string name="app_name">WhatsNear</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="nearby_locations">Nearby Locations</string>
+    <string name="nearby_locations">WhatsNear</string>
     <string name="see_locations">See Locations</string>
     <string name="stop_voice">Stop Voice</string>
     <string name="share_text">I am using this great traveling app: https://play.google.com/store/apps/details?id=com.scimsoft.cowiki</string>
