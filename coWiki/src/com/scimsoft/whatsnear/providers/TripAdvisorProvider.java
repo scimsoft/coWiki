@@ -62,7 +62,7 @@ public class TripAdvisorProvider extends Providers {
 		return text;
 	}
 
-	public List<String> getNearbyWikiEntries(Coordinates coordinates) {
+	public List<String> getNearbyRestaurantsList(Coordinates coordinates) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>(5);
 		params.add(new BasicNameValuePair("key", "ce0438de86eb46bf80da67f774ae36b3"));
 
@@ -82,16 +82,16 @@ public class TripAdvisorProvider extends Providers {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<String> titleList = new ArrayList<String>();
+		List<String> restaurantList = new ArrayList<String>();
 		for (int i = 0; i < query.length(); i++) {
 			try {
-				titleList.add(query.getJSONObject(i).getString("name"));
+				restaurantList.add(query.getJSONObject(i).getString("name"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return titleList;
+		return restaurantList;
 	}
 
 }

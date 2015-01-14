@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements OnInitListener {
 	private static final String PROPERTY_ID = "UA-37086905-2";
 	public LocationProvider locationProvider;
 	private WikiProvider wikiProvider;
+	private TripAdvisorProvider tripProvider;
 	private SpeechProvider speechProvider;
 	public LocalesProvider localeProvider;
 
@@ -44,8 +45,9 @@ public class MainActivity extends Activity implements OnInitListener {
 	public Tracker tracker;
 	private ShareActionProvider mShareActionProvider;
 	private Intent mShareIntent;
+	
 	private String lasteslected;
-	private TripAdvisorProvider tripProvider;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +73,11 @@ public class MainActivity extends Activity implements OnInitListener {
 
 	private void initGoogleTracker() {
 		GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-
 		tracker = analytics.newTracker(PROPERTY_ID);
 	}
 
 	private void addActionButtons() {
+		
 		ImageButton refreshButton = (ImageButton) findViewById(R.id.goRefresh);
 		refreshButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -134,7 +136,7 @@ public class MainActivity extends Activity implements OnInitListener {
 	}
 	public void noticeNewTripResults() {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
-		java.util.List<String> results = tripProvider.getNearbyWikiEntries(coordinates);
+		java.util.List<String> results = tripProvider.getNearbyRestaurantsList(coordinates);
 
 		if (!isMyServiceRunning()) {
 			Intent intent = new Intent();
