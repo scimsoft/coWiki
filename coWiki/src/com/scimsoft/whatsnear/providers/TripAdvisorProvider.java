@@ -26,7 +26,8 @@ public class TripAdvisorProvider extends Providers {
 	private JSONObject tripResponse;
 	private String titles;
 
-	private JSONArray query;
+	private JSONArray restaurantNameArray;
+	private JSONArray locationIdArray;
 
 	public String getDetailExtract(String title) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>(5);
@@ -76,16 +77,17 @@ public class TripAdvisorProvider extends Providers {
 		}
 
 		try {
-			query = tripResponse.getJSONArray("data");
+			restaurantNameArray = tripResponse.getJSONArray("data");
+			locationIdArray= tripResponse.getJSONArray("location_id");
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		List<String> restaurantList = new ArrayList<String>();
-		for (int i = 0; i < query.length(); i++) {
+		for (int i = 0; i < restaurantNameArray.length(); i++) {
 			try {
-				restaurantList.add(query.getJSONObject(i).getString("name"));
+				restaurantList.add(restaurantNameArray.getJSONObject(i).getString("name"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -1,6 +1,8 @@
 package com.scimsoft.whatsnear.view;
 
+import com.google.android.gms.drive.internal.GetDriveIdFromUniqueIdentifierRequest;
 import com.scimsoft.whatsnear.R;
+import com.scimsoft.whatsnear.adapters.CustomArrayAdapter;
 
 import android.R.color;
 import android.content.Intent;
@@ -20,11 +22,10 @@ public class WikiResultsListViewActivityProvider extends ListViewActivityProvide
 	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		list = getIntent().getExtras().getStringArrayList("list");
 		
-		setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list));
+		list = getIntent().getExtras().getStringArrayList("list");		
+		setListAdapter(new CustomArrayAdapter(this,list,getResources().getDrawable(R.drawable.ic_wiki_logo)));
 		getListView().setTextFilterEnabled(true);
 		getListView().setBackgroundColor(color.black);
 		LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(this, R.anim.list_layout_controller);
