@@ -7,5 +7,5 @@
     <string name="nearby_locations">Nearby Locations</string>
     <string name="see_locations">See Locations</string>
     <string name="stop_voice">Stop Voice</string>
-
+	<string name="action_share">Share</string>
 </resources>
