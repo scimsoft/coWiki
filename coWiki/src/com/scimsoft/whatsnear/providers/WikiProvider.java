@@ -11,18 +11,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.location.Location;
+
 import com.scimsoft.whatsnear.MainActivity;
 import com.scimsoft.whatsnear.helpers.Coordinates;
-import com.scimsoft.whatsnear.helpers.JSONParser;
+import com.scimsoft.whatsnear.helpers.WikiEntries;
 import com.scimsoft.whatsnear.helpers.WikiEntry;
 
 public class WikiProvider extends Providers {
 
+	private WikiEntries allWikiEntries;
 	public WikiProvider(MainActivity mainActivity) {
 		super(mainActivity);
+		allWikiEntries = new WikiEntries();
 	}
 
-	JSONParser parser = new JSONParser();
+
 
 	private JSONObject wikiResponse;
 	private JSONArray titles;
@@ -47,11 +51,10 @@ public class WikiProvider extends Providers {
 			e.printStackTrace();
 		}
 
-		WikiEntry wikientry = new WikiEntry(title);
+		WikiEntry wikientry = allWikiEntries.getWikiEntrie(title);
 		try {
 			JSONObject query = wikiResponse.getJSONObject("query");
 			JSONObject pages = query.getJSONObject("pages");
-			@SuppressWarnings("unchecked")
 			Iterator<String> iterator = pages.keys();
 			String key = "";
 			while (iterator.hasNext()) {
@@ -97,16 +100,23 @@ public class WikiProvider extends Providers {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<String> titleList = new ArrayList<String>();
+		
 		for (int i = 0; i < titles.length(); i++) {
-			try {
-				titleList.add(titles.getJSONObject(i).getString("title"));
+			try {				
+				String wikiEntryTitle = titles.getJSONObject(i).getString("title");				
+				WikiEntry wikiEntry = new WikiEntry(wikiEntryTitle);
+				Location location = new Location("");
+				location.setLatitude(titles.getJSONObject(i).getDouble("lat"));
+				location.setLongitude(titles.getJSONObject(i).getDouble("lon"));				
+				wikiEntry.setLocation(location);
+				allWikiEntries.addWikiEntry(wikiEntry);
+				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return titleList;
+		return allWikiEntries.getNameList();
 	}
 
 }

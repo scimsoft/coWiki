@@ -1,21 +1,23 @@
 package com.scimsoft.whatsnear.providers;
 
-import java.util.List;
-
 import com.scimsoft.whatsnear.MainActivity;
+import com.scimsoft.whatsnear.helpers.JSONParser;
 import com.scimsoft.whatsnear.helpers.NearLocation;
 
 public class Providers {
-	
+	protected JSONParser parser;
 	protected MainActivity mainActivity;
 
 	protected Providers(MainActivity mainActivity){
 		this.mainActivity = mainActivity;
+		parser = new JSONParser();
 	}
 	
 	public <T extends NearLocation> T getDetails(String name){
 		return null;
 	}
+
+	
 	
 	
 

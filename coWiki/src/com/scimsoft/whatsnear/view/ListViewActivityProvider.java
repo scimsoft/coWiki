@@ -11,7 +11,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ListView;
 
-import com.scimsoft.whatsnear.R;
+import com.scimsoft.cowiki.R;
 
 public class ListViewActivityProvider extends ListActivity {
 
@@ -37,5 +37,6 @@ public class ListViewActivityProvider extends ListActivity {
 		setResult(RESULT_OK, intent);
 		finish();
 	}
+	
 
 }

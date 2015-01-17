@@ -2,7 +2,7 @@ package com.scimsoft.whatsnear.view;
 
 import android.os.Bundle;
 
-import com.scimsoft.whatsnear.R;
+import com.scimsoft.cowiki.R;
 import com.scimsoft.whatsnear.adapters.CustomArrayAdapter;
 
 public class TripResultsListViewActivityProvider extends ListViewActivityProvider {

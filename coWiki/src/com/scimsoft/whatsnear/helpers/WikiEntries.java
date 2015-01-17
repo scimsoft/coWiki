@@ -6,10 +6,13 @@ import java.util.List;
 import android.location.Location;
 
 public class WikiEntries {
-	private ArrayList<WikiEntry> entries = new ArrayList<WikiEntry>();
+	private ArrayList<WikiEntry> entries;
 	
+	public WikiEntries(){
+		entries = new ArrayList<WikiEntry>();
+	}
 	public void addWikiEntry(WikiEntry wikientry){
-		if(!getWikiEntrie(wikientry.getName()).getName().equals("Not Found"))
+		if(getWikiEntrie(wikientry.getName()).getName().equals("Not Found"))
 		entries.add(wikientry);
 	}
 	public void addWikiData(String name, Location location){

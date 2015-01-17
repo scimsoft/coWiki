@@ -7,12 +7,14 @@ import java.util.List;
 public class WikiEntry extends NearLocation {
 	private StringBuffer extract;
 	private URI mainInmageUri;
-	private List<String> extact;
+	
 	public WikiEntry(String name) {
+		extract= new StringBuffer("");
 		super.name=name;
 	}
 	public WikiEntry() {
 		this.name="Not Found";
+		extract= new StringBuffer("");
 	}
 	/**
 	 * @return the extract

@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.scimsoft.whatsnear.R;
+import com.scimsoft.cowiki.R;
 
 public class CustomArrayAdapter extends ArrayAdapter<String> {
 	private final Context context;
@@ -32,10 +32,10 @@ public class CustomArrayAdapter extends ArrayAdapter<String> {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.customsimple_list, parent, false);
 		TextView textView = (TextView) rowView.findViewById(R.id.label);
-		//ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
+		ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
 		textView.setText(values.get(position));
-		textView.setCompoundDrawablesWithIntrinsicBounds(drawableLogo, null, null, null);
-		//imageView.setImageDrawable(drawableLogo);
+		//textView.setCompoundDrawablesWithIntrinsicBounds(drawableLogo, null, null, null);
+		imageView.setImageDrawable(drawableLogo);
 		return rowView;
 	}
 }

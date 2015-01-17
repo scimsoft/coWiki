@@ -5,23 +5,31 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.scimsoft.cowiki.R;
 import com.scimsoft.whatsnear.helpers.Coordinates;
 import com.scimsoft.whatsnear.helpers.NearLocation;
 import com.scimsoft.whatsnear.providers.LocalesProvider;
@@ -44,7 +52,6 @@ public class MainActivity extends Activity implements OnInitListener {
 
 	public java.util.List<String> results;
 
-	private Animation scale;
 	public Tracker tracker;
 	private ShareActionProvider mShareActionProvider;
 	private Intent mShareIntent;
@@ -52,12 +59,16 @@ public class MainActivity extends Activity implements OnInitListener {
 	private String lasteslected;
 	private Intent resultViewIntent;
 	private Providers lastProvider;
-	private boolean resultListViewOpen=false;
+	private NearLocation currentDetailLocation;
+	private boolean navigationButtonShown;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+		StrictMode.setThreadPolicy(policy);
 
 		addShareButton();
 
@@ -71,7 +82,6 @@ public class MainActivity extends Activity implements OnInitListener {
 			locationProvider.showSettingsAlert();
 		}
 
-		scale = AnimationUtils.loadAnimation(this, R.anim.scale_button);
 		resultViewIntent = new Intent();
 
 	}
@@ -87,7 +97,6 @@ public class MainActivity extends Activity implements OnInitListener {
 		refreshButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				v.startAnimation(scale);
 				locationProvider.getLocation();
 				speechProvider.interuptSpeech();
 				noticeNewTripResults();
@@ -100,7 +109,6 @@ public class MainActivity extends Activity implements OnInitListener {
 
 			@Override
 			public void onClick(View v) {
-				v.startAnimation(scale);
 				speechProvider.interuptSpeech();
 
 			}
@@ -112,7 +120,6 @@ public class MainActivity extends Activity implements OnInitListener {
 
 			@Override
 			public void onClick(View v) {
-				v.startAnimation(scale);
 				showDetails(lasteslected);
 			}
 		});
@@ -122,7 +129,6 @@ public class MainActivity extends Activity implements OnInitListener {
 
 			@Override
 			public void onClick(View v) {
-				v.startAnimation(scale);
 				locationProvider.getLocation();
 				speechProvider.interuptSpeech();
 				noticeNewTripResults();
@@ -133,7 +139,6 @@ public class MainActivity extends Activity implements OnInitListener {
 
 			@Override
 			public void onClick(View v) {
-				v.startAnimation(scale);
 				locationProvider.getLocation();
 				speechProvider.interuptSpeech();
 				noticeNewWikiResults();
@@ -154,8 +159,8 @@ public class MainActivity extends Activity implements OnInitListener {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
 		java.util.List<String> results = wikiProvider.getNearbyWikiEntries(coordinates);
 		lastProvider = wikiProvider;
-		if (!resultListViewOpen) {
-			resultListViewOpen = true;
+		if (!isMyServiceRunning()) {
+
 			resultViewIntent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
 			resultViewIntent.putStringArrayListExtra("list", (ArrayList<String>) results);
 			startActivityForResult(resultViewIntent, 0);
@@ -167,8 +172,8 @@ public class MainActivity extends Activity implements OnInitListener {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
 		java.util.List<String> results = tripProvider.getNearbyRestaurantsList(coordinates);
 		lastProvider = tripProvider;
-		if (!resultListViewOpen) {
-			resultListViewOpen = true;
+		if (!isMyServiceRunning()) {
+
 			resultViewIntent.setClass(MainActivity.this, TripResultsListViewActivityProvider.class);
 			resultViewIntent.putStringArrayListExtra("list", (ArrayList<String>) results);
 			startActivityForResult(resultViewIntent, 0);
@@ -177,22 +182,70 @@ public class MainActivity extends Activity implements OnInitListener {
 	}
 
 	private boolean isMyServiceRunning() {
-		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.scimsoft.view.ListViewActivityProvider.class".equals(service.service.getClassName())) {
-				return true;
-			}
+		ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+		List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+		Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
+		ComponentName componentInfo = taskInfo.get(0).topActivity;
+		String packagename = componentInfo.getPackageName();
+		if (packagename.endsWith("view")) {
+			return true;
 		}
 		return false;
 	}
 
 	public void showDetails(String selected) {
 		this.lasteslected = selected;
-		NearLocation nearLocation = lastProvider.getDetails(selected);
-		List<String> extract = nearLocation.getDetailTexts();
+		currentDetailLocation = lastProvider.getDetails(selected);
+		setDetailViewImages();
+
+		List<String> extract = currentDetailLocation.getDetailTexts();
 		speechProvider.speekStringList(extract);
 		tracker.setScreenName("details");
 		tracker.send(new HitBuilders.AppViewBuilder().build());
+	}
+
+	private void setDetailViewImages() {
+		if (!navigationButtonShown) {
+			navigationButtonShown = true;
+			LinearLayout layout = (LinearLayout) findViewById(R.id.upperButtonLayout);
+
+			ImageButton navigationButton = new ImageButton(this);
+			navigationButton.setImageResource(R.drawable.btn_navigate);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			// params.gravity=Gravity.CENTER_VERTICAL;
+			params.gravity = Gravity.CENTER_HORIZONTAL;
+			navigationButton.setAdjustViewBounds(true);
+
+			navigationButton.setLayoutParams(params);
+			int[] attrs = new int[] { android.R.attr.selectableItemBackground};
+
+			TypedArray ta = this.obtainStyledAttributes(attrs);
+
+			Drawable drawableFromTheme = ta.getDrawable(0);
+
+			// Finally, free the resources used by TypedArray
+			ta.recycle();
+			navigationButton.setBackground(drawableFromTheme);
+			navigationButton.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Location geo = currentDetailLocation.getLocation();
+					speechProvider.interuptSpeech();
+					Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?daddr="
+							+ String.valueOf(geo.getLatitude()).replace(",", ".") + "," + String.valueOf(geo.getLongitude()).replace(",", ".")));
+					startActivity(intent);
+
+				}
+			});
+			layout.addView(navigationButton);
+
+			View view1 = new View(this);
+			LinearLayout.LayoutParams paramsView = new LinearLayout.LayoutParams(0, 1);
+			view1.setLayoutParams(paramsView);
+			layout.addView(view1);
+		}
+
 	}
 
 	private void startProviders() {
@@ -229,7 +282,7 @@ public class MainActivity extends Activity implements OnInitListener {
 		if (data == null) {
 			return;
 		}
-		resultListViewOpen=false;
+
 		String result = data.getStringExtra("result");
 		setMessageText(result);
 		showDetails(result);

@@ -15,6 +15,7 @@
         android:textSize="30sp" />
     
     <LinearLayout
+        android:id="@+id/upperButtonLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom"
@@ -29,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:background="@color/black"
+            android:background="?android:selectableItemBackground"
             android:contentDescription="@string/stop_voice"
             android:gravity="center_horizontal|center_vertical"
             android:src="@drawable/btn_wikipedia" />
@@ -44,9 +45,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:background="@color/black"
             android:contentDescription="@string/stop_voice"
             android:gravity="center_horizontal|center_vertical"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/btn_restaurant" />
         
         <View

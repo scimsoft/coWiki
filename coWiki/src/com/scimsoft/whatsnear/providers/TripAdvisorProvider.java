@@ -15,29 +15,28 @@ import android.net.Uri;
 
 import com.scimsoft.whatsnear.MainActivity;
 import com.scimsoft.whatsnear.helpers.Coordinates;
-import com.scimsoft.whatsnear.helpers.JSONParser;
 import com.scimsoft.whatsnear.helpers.Restaurant;
 import com.scimsoft.whatsnear.helpers.Restaurants;
 
 public class TripAdvisorProvider extends Providers {
 
-	private Restaurants restaurantsArray;
+	private Restaurants allRestaurants;
 	private static String country;
 
 	public TripAdvisorProvider(MainActivity mainActivity) {
 		super(mainActivity);
-		restaurantsArray = new Restaurants();
+		allRestaurants = new Restaurants();
 		country = mainActivity.localeProvider.getLocale().getLanguage();
 	}
 
-	JSONParser parser = new JSONParser();
+	
 	JSONObject tripResponse = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Restaurant getDetails(String title) {
 		
-		Restaurant selectedRestaurant = restaurantsArray.getRestaurant(title);
+		Restaurant selectedRestaurant = allRestaurants.getRestaurant(title);
 		ArrayList<String> result = new ArrayList<String>();
 		result.add(selectedRestaurant.getName() + "... ");
 		String wikiUrl = "http://api.tripadvisor.com/api/partner/2.0/location/"+String.valueOf(selectedRestaurant.getId());
@@ -66,7 +65,7 @@ public class TripAdvisorProvider extends Providers {
 		
 	}
 	public Restaurant getDetailExtract(String name) {
-		return restaurantsArray.getRestaurant(name);
+		return allRestaurants.getRestaurant(name);
 	}
 
 	public List<String> getNearbyRestaurantsList(Coordinates coordinates) {
@@ -93,14 +92,14 @@ public class TripAdvisorProvider extends Providers {
 						Uri.parse(tripObject.getString("web_url")));
 				restaurant.addRatingUri(Uri.parse(tripObject.getString("rating_image_url")));
 				restaurant.addDetailUri(Uri.parse(tripObject.getString("api_detail_url")));
-				restaurantsArray.addRestaurant(restaurant);
+				allRestaurants.addRestaurant(restaurant);
 				}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return restaurantsArray.getNameList();
+		return allRestaurants.getNameList();
 	}
 
 }
