@@ -1,5 +1,6 @@
 package com.scimsoft.whatsnear.providers;
 
+import java.util.Iterator;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -14,11 +15,17 @@ public class SpeechProvider extends Providers{
 		super(mainActivity);
 		tts = new TextToSpeech(mainActivity, mainActivity);
 		
+		
 		// TODO Auto-generated constructor stub
 	}
 	
 	public void addSpeechQueue(String text) {
 		tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+		
+	}
+	public void addSpeechQueueWithSilence(String text){
+		addSpeechQueue(text);
+		tts.playSilence(1800, TextToSpeech.QUEUE_ADD, null);
 	}
 	@SuppressLint("NewApi")
 	public void onInit(int status) {
@@ -65,6 +72,14 @@ public class SpeechProvider extends Providers{
 		if (tts != null) {
 			tts.stop();
 			}
+	}
+
+	public void speekStringList(List<String> extract) {
+		tts.stop();
+		Iterator<String> it = extract.iterator();
+		while(it.hasNext()){
+			addSpeechQueueWithSilence(it.next());			
+		}
 	}
 
 }

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import com.scimsoft.whatsnear.MainActivity;
 import com.scimsoft.whatsnear.helpers.Coordinates;
 import com.scimsoft.whatsnear.helpers.JSONParser;
+import com.scimsoft.whatsnear.helpers.WikiEntry;
 
 public class WikiProvider extends Providers {
 
@@ -26,7 +27,9 @@ public class WikiProvider extends Providers {
 	private JSONObject wikiResponse;
 	private JSONArray titles;
 
-	public String getDetailExtract(String title) {
+	@SuppressWarnings("unchecked")
+	@Override
+	public WikiEntry getDetails(String title) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>(5);
 		params.add(new BasicNameValuePair("action", "query"));
 		params.add(new BasicNameValuePair("prop", "extracts"));
@@ -44,7 +47,7 @@ public class WikiProvider extends Providers {
 			e.printStackTrace();
 		}
 
-		String text = "";
+		WikiEntry wikientry = new WikiEntry(title);
 		try {
 			JSONObject query = wikiResponse.getJSONObject("query");
 			JSONObject pages = query.getJSONObject("pages");
@@ -53,7 +56,7 @@ public class WikiProvider extends Providers {
 			String key = "";
 			while (iterator.hasNext()) {
 				key = iterator.next();
-				text = (String) ((JSONObject) pages.get(key)).get("extract");
+				wikientry.addExtract((String) ((JSONObject) pages.get(key)).get("extract"));
 			}
 
 		} catch (JSONException e) {
@@ -61,7 +64,7 @@ public class WikiProvider extends Providers {
 			e.printStackTrace();
 		}
 
-		return text;
+		return wikientry;
 	}
 
 	public List<String> getNearbyWikiEntries(Coordinates coordinates) {
