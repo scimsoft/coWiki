@@ -2,7 +2,6 @@ package com.scimsoft.whatsnear.providers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -11,89 +10,97 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.location.Location;
+import android.net.Uri;
+
 import com.scimsoft.whatsnear.MainActivity;
 import com.scimsoft.whatsnear.helpers.Coordinates;
 import com.scimsoft.whatsnear.helpers.JSONParser;
+import com.scimsoft.whatsnear.helpers.Restaurant;
+import com.scimsoft.whatsnear.helpers.Restaurants;
 
 public class TripAdvisorProvider extends Providers {
 
+	private Restaurants restaurantsArray;
+	private static String country;
+
 	public TripAdvisorProvider(MainActivity mainActivity) {
 		super(mainActivity);
+		restaurantsArray = new Restaurants();
+		country = mainActivity.localeProvider.getLocale().getLanguage();
 	}
 
 	JSONParser parser = new JSONParser();
+	JSONObject tripResponse = null;
 
-	private JSONObject tripResponse;
-	private String titles;
-
-	private JSONArray restaurantNameArray;
-	private JSONArray locationIdArray;
-
-	public String getDetailExtract(String title) {
-		List<NameValuePair> params = new ArrayList<NameValuePair>(5);
+	@SuppressWarnings("unchecked")
+	@Override
+	public Restaurant getDetails(String title) {
+		
+		Restaurant selectedRestaurant = restaurantsArray.getRestaurant(title);
+		ArrayList<String> result = new ArrayList<String>();
+		result.add(selectedRestaurant.getName() + "... ");
+		String wikiUrl = "http://api.tripadvisor.com/api/partner/2.0/location/"+String.valueOf(selectedRestaurant.getId());
+		
+		List<NameValuePair> params = new ArrayList<NameValuePair>(2);
 		params.add(new BasicNameValuePair("key", "ce0438de86eb46bf80da67f774ae36b3"));
-
-		try {
-			String country = mainActivity.localeProvider.getLocale().getLanguage();
-			String wikiUrl = "http://api.tripadvisor.com/api/partner/2.0/map/";
-
-			tripResponse = parser.makeHttpRequest(wikiUrl, params);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		String text = "";
-		try {
-			JSONObject query = tripResponse.getJSONObject("query");
-			JSONObject pages = query.getJSONObject("pages");
-			@SuppressWarnings("unchecked")
-			Iterator<String> iterator = pages.keys();
-			String key = "";
-			while (iterator.hasNext()) {
-				key = iterator.next();
-				text = (String) ((JSONObject) pages.get(key)).get("extract");
+		params.add(new BasicNameValuePair("lang",country));
+		try {			
+			
+			JSONObject apiResponse = parser.makeHttpRequest(wikiUrl,params);
+			JSONArray reviews = apiResponse.getJSONArray("reviews");
+			for (int i = 0; i< reviews.length(); i++) {
+				JSONObject review = (JSONObject) reviews.get(i);
+				String reviewText = review.getString("text");
+				String strippedText = new String(reviewText.getBytes("ISO-8859-1"), "UTF-8");
+				result.add(strippedText);
+				
 			}
-
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (JSONException e) {
-
 			e.printStackTrace();
 		}
-
-		return text;
+		selectedRestaurant.adReviews(result);
+		return selectedRestaurant;
+		
+	}
+	public Restaurant getDetailExtract(String name) {
+		return restaurantsArray.getRestaurant(name);
 	}
 
 	public List<String> getNearbyRestaurantsList(Coordinates coordinates) {
-		List<NameValuePair> params = new ArrayList<NameValuePair>(5);
+		List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+		
 		params.add(new BasicNameValuePair("key", "ce0438de86eb46bf80da67f774ae36b3"));
-
+		params.add(new BasicNameValuePair("lang",country));
 		try {
 			String wikiUrl = "http://api.tripadvisor.com/api/partner/2.0/map/";
 			wikiUrl += coordinates.getLatitude() + "," + coordinates.getLongtitude();
+			wikiUrl += "/restaurants";
 			tripResponse = parser.makeHttpRequest(wikiUrl, params);
+			JSONArray restaurantNameArray = tripResponse.getJSONArray("data");
+			for (int i = 0; i< restaurantNameArray.length(); i++) {
+				JSONObject tripObject = (JSONObject) restaurantNameArray.get(i);
+				tripObject.get("latitude");
+				Location location = new Location("");
+				location.setLatitude(Double.valueOf(tripObject.getString("latitude")));
+				location.setLongitude(Double.valueOf(tripObject.getString("longitude")));
+
+				Restaurant restaurant = new Restaurant(Long.valueOf(tripObject.getString("location_id")),
+						tripObject.getString("name"),
+						location,
+						Uri.parse(tripObject.getString("web_url")));
+				restaurant.addRatingUri(Uri.parse(tripObject.getString("rating_image_url")));
+				restaurant.addDetailUri(Uri.parse(tripObject.getString("api_detail_url")));
+				restaurantsArray.addRestaurant(restaurant);
+				}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-		try {
-			restaurantNameArray = tripResponse.getJSONArray("data");
-			locationIdArray= tripResponse.getJSONArray("location_id");
-
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<String> restaurantList = new ArrayList<String>();
-		for (int i = 0; i < restaurantNameArray.length(); i++) {
-			try {
-				restaurantList.add(restaurantNameArray.getJSONObject(i).getString("name"));
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return restaurantList;
+		return restaurantsArray.getNameList();
 	}
 
 }

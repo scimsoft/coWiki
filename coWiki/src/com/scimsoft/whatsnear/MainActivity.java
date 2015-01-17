@@ -1,6 +1,7 @@
 package com.scimsoft.whatsnear;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -22,11 +23,14 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.scimsoft.whatsnear.helpers.Coordinates;
+import com.scimsoft.whatsnear.helpers.NearLocation;
 import com.scimsoft.whatsnear.providers.LocalesProvider;
 import com.scimsoft.whatsnear.providers.LocationProvider;
+import com.scimsoft.whatsnear.providers.Providers;
 import com.scimsoft.whatsnear.providers.SpeechProvider;
 import com.scimsoft.whatsnear.providers.TripAdvisorProvider;
 import com.scimsoft.whatsnear.providers.WikiProvider;
+import com.scimsoft.whatsnear.view.TripResultsListViewActivityProvider;
 import com.scimsoft.whatsnear.view.WikiResultsListViewActivityProvider;
 
 public class MainActivity extends Activity implements OnInitListener {
@@ -44,9 +48,11 @@ public class MainActivity extends Activity implements OnInitListener {
 	public Tracker tracker;
 	private ShareActionProvider mShareActionProvider;
 	private Intent mShareIntent;
-	
+
 	private String lasteslected;
-	
+	private Intent resultViewIntent;
+	private Providers lastProvider;
+	private boolean resultListViewOpen=false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +60,7 @@ public class MainActivity extends Activity implements OnInitListener {
 		setContentView(R.layout.activity_main);
 
 		addShareButton();
-		
+
 		addActionButtons();
 
 		startProviders();
@@ -66,8 +72,8 @@ public class MainActivity extends Activity implements OnInitListener {
 		}
 
 		scale = AnimationUtils.loadAnimation(this, R.anim.scale_button);
+		resultViewIntent = new Intent();
 
-		
 	}
 
 	private void initGoogleTracker() {
@@ -76,7 +82,7 @@ public class MainActivity extends Activity implements OnInitListener {
 	}
 
 	private void addActionButtons() {
-		
+
 		ImageButton refreshButton = (ImageButton) findViewById(R.id.goRefresh);
 		refreshButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -110,7 +116,7 @@ public class MainActivity extends Activity implements OnInitListener {
 				showDetails(lasteslected);
 			}
 		});
-		
+
 		ImageButton goRestaurant = (ImageButton) findViewById(R.id.goRestaurant);
 		goRestaurant.setOnClickListener(new OnClickListener() {
 
@@ -147,24 +153,25 @@ public class MainActivity extends Activity implements OnInitListener {
 	public void noticeNewWikiResults() {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
 		java.util.List<String> results = wikiProvider.getNearbyWikiEntries(coordinates);
-
-		if (!isMyServiceRunning()) {
-			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
-			intent.putStringArrayListExtra("list", (ArrayList<String>) results);
-			startActivityForResult(intent, 0);
+		lastProvider = wikiProvider;
+		if (!resultListViewOpen) {
+			resultListViewOpen = true;
+			resultViewIntent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
+			resultViewIntent.putStringArrayListExtra("list", (ArrayList<String>) results);
+			startActivityForResult(resultViewIntent, 0);
 			speechProvider.speekResults(results);
 		}
 	}
+
 	public void noticeNewTripResults() {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
 		java.util.List<String> results = tripProvider.getNearbyRestaurantsList(coordinates);
-
-		if (!isMyServiceRunning()) {
-			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
-			intent.putStringArrayListExtra("list", (ArrayList<String>) results);
-			startActivityForResult(intent, 0);
+		lastProvider = tripProvider;
+		if (!resultListViewOpen) {
+			resultListViewOpen = true;
+			resultViewIntent.setClass(MainActivity.this, TripResultsListViewActivityProvider.class);
+			resultViewIntent.putStringArrayListExtra("list", (ArrayList<String>) results);
+			startActivityForResult(resultViewIntent, 0);
 			speechProvider.speekResults(results);
 		}
 	}
@@ -181,18 +188,19 @@ public class MainActivity extends Activity implements OnInitListener {
 
 	public void showDetails(String selected) {
 		this.lasteslected = selected;
-		String extract = wikiProvider.getDetailExtract(selected);
-		speechProvider.speekWikiExtract(extract);
+		NearLocation nearLocation = lastProvider.getDetails(selected);
+		List<String> extract = nearLocation.getDetailTexts();
+		speechProvider.speekStringList(extract);
 		tracker.setScreenName("details");
 		tracker.send(new HitBuilders.AppViewBuilder().build());
 	}
 
 	private void startProviders() {
+		localeProvider = new LocalesProvider(this);
 		locationProvider = new LocationProvider(this);
 		wikiProvider = new WikiProvider(this);
 		tripProvider = new TripAdvisorProvider(this);
 		speechProvider = new SpeechProvider(this);
-		localeProvider = new LocalesProvider(this);
 
 	}
 
@@ -205,6 +213,7 @@ public class MainActivity extends Activity implements OnInitListener {
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		speechProvider.onDestroy();
 		locationProvider.stopUsingGPS();
 	}
@@ -220,6 +229,7 @@ public class MainActivity extends Activity implements OnInitListener {
 		if (data == null) {
 			return;
 		}
+		resultListViewOpen=false;
 		String result = data.getStringExtra("result");
 		setMessageText(result);
 		showDetails(result);
