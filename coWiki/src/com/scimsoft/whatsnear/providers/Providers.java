@@ -4,7 +4,7 @@ import com.scimsoft.whatsnear.MainActivity;
 import com.scimsoft.whatsnear.helpers.JSONParser;
 import com.scimsoft.whatsnear.helpers.NearLocation;
 
-public class Providers {
+public abstract class Providers {
 	protected JSONParser parser;
 	protected MainActivity mainActivity;
 
@@ -15,6 +15,11 @@ public class Providers {
 	
 	public <T extends NearLocation> T getDetails(String name){
 		return null;
+	}
+
+	public void setListShown() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

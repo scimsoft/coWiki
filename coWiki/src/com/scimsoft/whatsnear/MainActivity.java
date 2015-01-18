@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -14,7 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.speech.tts.TextToSpeech.OnInitListener;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -99,7 +96,8 @@ public class MainActivity extends Activity implements OnInitListener {
 			public void onClick(View v) {
 				locationProvider.getLocation();
 				speechProvider.interuptSpeech();
-				noticeNewTripResults();
+				wikiProvider.renewAllResults();
+				noticeNewWikiResults();
 			}
 
 		});
@@ -159,12 +157,12 @@ public class MainActivity extends Activity implements OnInitListener {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
 		java.util.List<String> results = wikiProvider.getNearbyWikiEntries(coordinates);
 		lastProvider = wikiProvider;
-		if (!isMyServiceRunning()) {
-
+		if (!isMyServiceRunning()&& results.size()>0) {
 			resultViewIntent.setClass(MainActivity.this, WikiResultsListViewActivityProvider.class);
 			resultViewIntent.putStringArrayListExtra("list", (ArrayList<String>) results);
 			startActivityForResult(resultViewIntent, 0);
 			speechProvider.speekResults(results);
+			setLocationsViewed();
 		}
 	}
 
@@ -172,7 +170,7 @@ public class MainActivity extends Activity implements OnInitListener {
 		Coordinates coordinates = new Coordinates(locationProvider.getLatitude(), locationProvider.getLongitude());
 		java.util.List<String> results = tripProvider.getNearbyRestaurantsList(coordinates);
 		lastProvider = tripProvider;
-		if (!isMyServiceRunning()) {
+		if (!isMyServiceRunning()&& results.size()>0) {
 
 			resultViewIntent.setClass(MainActivity.this, TripResultsListViewActivityProvider.class);
 			resultViewIntent.putStringArrayListExtra("list", (ArrayList<String>) results);
@@ -182,14 +180,7 @@ public class MainActivity extends Activity implements OnInitListener {
 	}
 
 	private boolean isMyServiceRunning() {
-		ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-		List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-		Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
-		ComponentName componentInfo = taskInfo.get(0).topActivity;
-		String packagename = componentInfo.getPackageName();
-		if (packagename.endsWith("view")) {
-			return true;
-		}
+
 		return false;
 	}
 
@@ -217,7 +208,7 @@ public class MainActivity extends Activity implements OnInitListener {
 			navigationButton.setAdjustViewBounds(true);
 
 			navigationButton.setLayoutParams(params);
-			int[] attrs = new int[] { android.R.attr.selectableItemBackground};
+			int[] attrs = new int[] { android.R.attr.selectableItemBackground };
 
 			TypedArray ta = this.obtainStyledAttributes(attrs);
 
@@ -282,10 +273,18 @@ public class MainActivity extends Activity implements OnInitListener {
 		if (data == null) {
 			return;
 		}
+		if (resultCode == RESULT_OK) {
+			
+			String result = data.getStringExtra("result");
+			setMessageText(result);
+			showDetails(result);
+			setLocationsViewed();
+		}
+	}
 
-		String result = data.getStringExtra("result");
-		setMessageText(result);
-		showDetails(result);
+	private void setLocationsViewed() {
+		if(lastProvider.getClass()==WikiProvider.class)
+		lastProvider.setListShown();
 	}
 
 	@Override

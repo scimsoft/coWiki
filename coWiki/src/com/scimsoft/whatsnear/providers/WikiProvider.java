@@ -118,5 +118,14 @@ public class WikiProvider extends Providers {
 		}
 		return allWikiEntries.getNameList();
 	}
+	@Override
+	public void setListShown(){
+		allWikiEntries.setListShown();
+	}
+
+	public void renewAllResults() {
+		allWikiEntries.renewAllEntries();
+		
+	}
 
 }

@@ -101,5 +101,13 @@ public class TripAdvisorProvider extends Providers {
 		}
 		return allRestaurants.getNameList();
 	}
+	@Override
+	public void setListShown(){
+		allRestaurants.setListShown();
+	}
+	public void renewAllResults() {
+		allRestaurants.renewAllEntries();
+		
+	}
 
 }

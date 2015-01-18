@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">coWiki</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -9,4 +8,6 @@
     <string name="stop_voice">Stop Voice</string>
 	<string name="action_share">Share</string>
 	<string name="btn_restaurant">Restaurants</string>
+    <string name="share_text">I am using this great traveling app: https://play.google.com/store/apps/details?id=com.scimsoft.cowiki</string>
+	<string name="share_subject">Share WhatsNear</string>
 </resources>

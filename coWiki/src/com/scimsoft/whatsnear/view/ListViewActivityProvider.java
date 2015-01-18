@@ -37,6 +37,11 @@ public class ListViewActivityProvider extends ListActivity {
 		setResult(RESULT_OK, intent);
 		finish();
 	}
+	protected void onDestroy() {
+       super.onDestroy();
+       setResult(RESULT_CANCELED, getIntent());
+       
+    }
 	
 
 }
